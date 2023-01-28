@@ -6,7 +6,9 @@ The purpose of this repository is to display data analysis projects I've made fo
 This repository contains the following projects:
 
 1. Defensive Tendency Breakdown - 
-I was lucky enough to recieve a csv file from an old position coach of mine that contained raw data from defensive film breakdown they performed on an upcoming opponent. I wrote a few functions in Python to analyze the game data and breakdown defensive tendencies for Coverage, Blitz, and Defensive Fronts.
+I was lucky enough to recieve a csv file from an old position coach of mine that contained raw data from defensive film breakdown they performed on an upcoming opponent. I wrote a few functions in Python to analyze the game data and breakdown defensive tendencies for Coverage, Blitz, and Defensive Fronts. Select the link below for all the data.
+
+https://docs.google.com/spreadsheets/d/1lETUf_PasgCZeI4Lfm5_czovfRyKT7KTKWFH0-H0R4s/edit?usp=sharing
 
 2. Win Prediction Model and Probability - 
 This project took inspiration from the books "The Hidden Game of Football" by Bob Carroll and "The New Bill James Historical Baseball Abstract" by Bill James. I started this project by using the Beautiful Soup Python package to web scrape 19 years of NFL Regular Season Team Data. From this data, I used pythagorean thoerem, linear regression modeling, and multiple methods of distribution to create models for predicting win percentage over the course of an NFL season.
