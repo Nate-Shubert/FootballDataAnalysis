@@ -6,7 +6,6 @@ The purpose of this repository is to display data analysis projects I've made fo
 This repository contains the following projects:
 
 1. Defensive Tendency Breakdown
-
 I was lucky enough to recieve a csv file from an old position coach of mine that contained raw data from defensive film breakdown they performed on an upcoming opponent. I wrote a few functions in Python to analyze the game data and breakdown defensive tendencies for Coverage, Blitz, and Defensive Fronts.
 
 2. Win Prediction Model and Probability
