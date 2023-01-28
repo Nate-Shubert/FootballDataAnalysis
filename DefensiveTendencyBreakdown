@@ -1,0 +1,176 @@
+#Created By Nathan Shubert
+#This code takes a simple dataframe of defensive results and turns it into a scouting tendencies report.
+
+import pandas as pd
+import numpy as np
+import random
+
+#function takes dataframe and breaks it down into defensive front tendencies.
+def calcFrontTendencies(gameDF):
+    dfCov = gameDF[['Front','Down', 'Distance']].copy()
+    for i in dfCov.iterrows():
+        if int(i[1]['Distance']) < 3:
+            i[1]['Distance'] = "Short"
+        elif int(i[1]['Distance']) < 7:
+            i[1]['Distance'] = "Mid"
+        elif int(i[1]['Distance']) < 10:
+            i[1]['Distance'] = "Long"
+        elif int(i[1]['Distance']) == 10 and int(i[1]['Down']) == 1:
+            i[1]['Distance'] = "1st & 10"
+        else:
+            i[1]['Distance'] = "Very Long"
+    
+    newCovCol = []
+    for i in dfCov.iterrows():
+        newCovCol.append(0)
+    dfCov['Tendency'] = newCovCol
+    playCount = len(gameDF)
+    
+    for i in range(len(dfCov)):
+        for j in range(len(dfCov)):
+            if dfCov.iloc[i, 0] == dfCov.iloc[j, 0]:
+                if dfCov.iloc[i, 1] == dfCov.iloc[j, 1]:
+                    if dfCov.iloc[i, 2] == dfCov.iloc[j, 2]:
+                        dfCov.iloc[i,3] += 1
+    dfCov = dfCov.drop_duplicates()
+    
+    agg_functions = {'Tendency': 'sum'}
+    dfTypeCov = dfCov.groupby(dfCov['Front']).aggregate(agg_functions)
+    dfTypeCov['Percentage'] = dfTypeCov['Tendency'] / playCount
+    # Save General Percentage of Fronts
+    generalFrontDF = dfTypeCov
+    
+    agg_functions2 = {'Tendency': 'sum'}
+    dfDndBlitz = dfCov.groupby(['Down','Distance']).aggregate(agg_functions2)
+    dfDndBlitz['Percentage'] = dfDndBlitz['Tendency'] / playCount
+    # Save Defensive Front Tendencies based on Down and Distance.
+    specificFrontDF = dfDndBlitz
+    
+    return [generalFrontDF,specificFrontDF]
+
+#function takes dataframe and breaks it down into coverage tendencies.
+def calcCoverageTendencies(gameDF):
+    dfCov = gameDF[['Coverage','Down', 'Distance','Yds Gained','Personnel']].copy()
+    for i in dfCov.iterrows():
+        if int(i[1]['Distance']) < 3:
+            i[1]['Distance'] = "Short"
+        elif int(i[1]['Distance']) < 7:
+            i[1]['Distance'] = "Mid"
+        elif int(i[1]['Distance']) < 10:
+            i[1]['Distance'] = "Long"
+        elif int(i[1]['Distance']) == 10 and int(i[1]['Down']) == 1:
+            i[1]['Distance'] = "1st & 10"
+        else:
+            i[1]['Distance'] = "Very Long"
+    
+    newCovCol = []
+    for i in dfCov.iterrows():
+        newCovCol.append(0)
+    dfCov['Tendency'] = newCovCol
+    playCount = len(gameDF)
+    
+    for i in range(len(dfCov)):
+        for j in range(len(dfCov)):
+            if dfCov.iloc[i, 0] == dfCov.iloc[j, 0]:
+                if dfCov.iloc[i, 1] == dfCov.iloc[j, 1]:
+                    if dfCov.iloc[i, 2] == dfCov.iloc[j, 2]:
+                        dfCov.iloc[i,5] = 1
+    dfCov = dfCov.drop_duplicates()
+    
+    agg_functions = {'Tendency': 'sum'}
+    dfTypeCov = dfCov.groupby(['Coverage','Down','Distance']).aggregate(agg_functions)
+    dfTypeCov['Percentage'] = dfTypeCov['Tendency'] / playCount
+    # Coverage tendency for down and distance.
+    downAndDistanceCovDF = dfTypeCov
+    
+    agg_functions = {'Tendency': 'sum'}
+    dfTypeCov = dfCov.groupby(dfCov['Coverage']).aggregate(agg_functions)
+    dfTypeCov['Percentage'] = dfTypeCov['Tendency'] / playCount
+    # Overall coverage tendencies
+    generalCovDF = dfTypeCov
+    
+    agg_functions3 = {'Tendency': 'sum'}
+    dfDndBlitz = dfCov.groupby(['Coverage','Personnel']).aggregate(agg_functions3)
+    dfDndBlitz['Percentage'] = dfDndBlitz['Tendency'] / playCount
+    # Coverage Tendencies based on personel groups
+    personelCovDF = dfDndBlitz
+    
+    return [generalCovDF,downAndDistanceCovDF,personelCovDF]
+    
+#function takes dataframe and breaks it down into blitz tendencies.
+def calcBlitzTendencies(gameDF):
+    dfBlitz = gameDF[['Blitz','Down', 'Distance']].copy()
+    for i in dfBlitz.iterrows():
+        if int(i[1]['Distance']) < 3:
+            i[1]['Distance'] = "Short"
+        elif int(i[1]['Distance']) < 7:
+            i[1]['Distance'] = "Mid"
+        elif int(i[1]['Distance']) < 10:
+            i[1]['Distance'] = "Long"
+        elif int(i[1]['Distance']) == 10 and int(i[1]['Down']) == 1:
+            i[1]['Distance'] = "1st & 10"
+        else:
+            i[1]['Distance'] = "Very Long"
+    
+    newBlitzCol = []
+    for i in dfBlitz.iterrows():
+        newBlitzCol.append(0)
+    dfBlitz['Tendency'] = newBlitzCol
+    playCount = len(dfBlitz)
+    dfBlitzReal = dfBlitz[dfBlitz.Blitz != "None"]
+    blitzCount = len(dfBlitzReal)
+    
+    for i in range(len(dfBlitzReal)):
+        for j in range(len(dfBlitzReal)):
+            if dfBlitzReal.iloc[i, 0] == dfBlitzReal.iloc[j, 0]:
+                if dfBlitzReal.iloc[i, 1] == dfBlitzReal.iloc[j, 1]:
+                    if dfBlitzReal.iloc[i, 2] == dfBlitzReal.iloc[j, 2]:
+                        dfBlitzReal.iloc[i,3] += 1
+    dfBlitzReal = dfBlitzReal.drop_duplicates()
+    dfBlitzReal['Percentage'] = dfBlitzReal['Tendency'] / blitzCount
+    # Blitz tendencies based on Down and Distance
+    downAndDistanceBlitzDF = dfBlitzReal
+    
+    agg_functions = {'Tendency': 'sum'}
+    dfTypeBlitz = dfBlitzReal.groupby(dfBlitzReal['Blitz']).aggregate(agg_functions)
+    dfTypeBlitz['Percentage'] = dfTypeBlitz['Tendency'] / blitzCount
+    # General Blitz tendencies
+    generalBlitzDF = dfTypeBlitz
+    
+    agg_functions2 = {'Tendency': 'sum'}
+    dfDndBlitz = dfBlitzReal.groupby(['Down','Distance']).aggregate(agg_functions2)
+    dfDndBlitz['Percentage'] = dfDndBlitz['Tendency'] / playCount
+    # Overall Blitz tendencies based on down and distance
+    OverallblitzDF = dfDndBlitz
+    #plot = dfDndBlitz.plot.pie(y='Percentage', figsize=(5, 5))
+    #print(plot)
+    #How Often do they blitz?
+    blitzTen = (blitzCount/playCount)*100
+    
+    return [blitzTen, OverallblitzDF, generalBlitzDF,downAndDistanceBlitzDF]
+
+
+# NECESSARY BEFORE RUNNING
+#tArr = imported data frame with columns below
+# ['Drive Id', 'Play ID', 'Clock', 'Field Position', 'Down', 'Distance','Personnel', 'Coverage', 'Front', 'Blitz', 'Result', 'Yds Gained']
+
+#[generalFrontDF,specificFrontDF]
+frontArr = calcFrontTendencies(tArr)
+
+#[generalCovDF,downAndDistanceCovDF,personelCovDF]
+covArr = calcCoverageTendencies(tArr)
+
+#[blitzTen, OverallblitzDF, generalBlitzDF,downAndDistanceBlitzDF]
+blitzArr = calcBlitzTendencies(tArr)
+
+
+with pd.ExcelWriter('tendencyOutput.xlsx') as writer:
+    frontArr[0].to_excel(writer, sheet_name='General Front Tendency')
+    frontArr[1].to_excel(writer, sheet_name='Front Tendency D&D')
+    covArr[0].to_excel(writer, sheet_name='General Coverage Tendency')
+    covArr[1].to_excel(writer, sheet_name='Coverage Tendency D&D')
+    covArr[2].to_excel(writer, sheet_name='Coverage Tendency Personel')
+    blitzArr[1].to_excel(writer, sheet_name='Overall Blitz Tendency')
+    blitzArr[2].to_excel(writer, sheet_name='Blitz Type Tendency')
+    blitzArr[3].to_excel(writer, sheet_name='Blitz Tendency D&D')
+    tArr.to_excel(writer, sheet_name='Data')
