@@ -1,6 +1,6 @@
 # Football Data Analysis Portfolio
 
-#Summary
+Summary
 The purpose of this repository is to display data analysis projects I've made for potential positions as an analyist in the National Football League.
 
 This repository contains the following projects:
