@@ -15,5 +15,5 @@ This project took inspiration from the books "The Hidden Game of Football" by Bo
 3. Oline_Analysis - 
 In this project, I took multiple [Kaggle datasets](https://www.kaggle.com/competitions/nfl-big-data-bowl-2023/data) related to NFL offensive line players data. The ultimiate goal was to find a way to isolate EPA contributions by individual linemen. I used the basic EPA model introduced by Bob Carroll for this. The final product is an interesting function that breakdown a linemens performance into 4 buckets in one play - Allowing a Sack, QB Hit, QB Hurry, or Clean Pocket. Having determined an average EPA value for these events, I determined the overall EPA value of each offensive linemen in the dataset.
 
-
-If you have any comments or questions, please reach out at nate.shubert@gmail.com.
+I have programing certifications saved on my [wiki](https://www.kaggle.com/competitions/nfl-big-data-bowl-2023/data) https://github.com/Nate-Shubert/FootballDataAnalysis/wiki.
+If you have any comments or questions, please reach out at nate.shubert@gmail.com. 
