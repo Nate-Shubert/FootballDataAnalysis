@@ -1,0 +1,84 @@
+library(tidyr)
+library(nflreadr)
+pbp <- load_pbp(2021)
+players <- load_player_stats(2021)
+
+#Get a unique set of Tight End names that played during the specified season(s).
+tight_ends <- players[(players$position == 'TE'),]
+head(tight_ends)
+te_names = unique(tight_ends[c("player_name")])
+te_vec <- te_names$player_name
+print(te_vec)
+
+#Clean dataframe to provide play-by-play data on only pass plays.
+rec_data <- pbp[,c('receiver_player_id','receiver_player_name','receiving_yards','comp_air_epa','comp_yac_epa','epa','play_id','game_id','week','season_type','touchdown','complete_pass','pass')]
+head(rec_data)
+rec_data2<-rec_data[!(rec_data$pass == 0),]
+head(rec_data2)
+
+rec_data2 = rec_data2[rec_data2$receiver_player_name %in% te_vec,]
+
+yacEPAVec = c()
+playCountVec = c()
+for (x in te_vec){
+  tempSum = sum(rec_data2[which(rec_data2$receiver_player_name==x), 'comp_yac_epa'])
+  playCount = sum(rec_data2$receiver_player_name == x)
+  tempEPAPlay = tempSum / playCount 
+  yacEPAVec <- append(yacEPAVec,tempEPAPlay)
+  playCountVec <- append(playCountVec,playCount)
+  
+}
+print(yacEPAVec)
+yacEPAVec[!is.na(yacEPAVec)]
+length(yacEPAVec)
+length(te_vec)
+
+# Create new DataFrame with only the Player Name, # of Opportunities, and their YAC-EPA
+df <- data.frame(
+  Player_Name = te_vec,
+  Play_Count = playCountVec,
+  Yac_EPA_Per_Play = yacEPAVec
+)
+df
+
+plotDistribution = function (x) {
+  N = length(x)
+  x <- na.omit(x)
+  hist( x,col = "light blue",probability = TRUE)
+  lines(density(x), col = "red")
+  rug(x)
+}
+
+#Trim Dataframe to Tight Ends with more that 50 opportunities
+plotDistribution(df$Yac_EPA_Per_Play)
+df2 <- df[(df$Play_Count >= 50),]
+df2
+plotDistribution(df2$Yac_EPA_Per_Play)
+df2 <- df2[order(df2$Yac_EPA_Per_Play, decreasing = FALSE), ]
+rownames(df2) <- NULL
+df2
+x1 <- as.numeric(rownames(df2))
+y1 <- df2$Yac_EPA_Per_Play
+plot(x = x1,y =y1,
+     xlab = "Rank",
+     ylab = "YAC EPA Per Target",
+     xlim = c(0,31),
+     ylim = c(0.1,0.7),
+     main = "2021 NFL Season Yac EPA/Tgt for TEs with 50> Targets"
+)
+# Linear fit
+abline(lm(y1 ~ x1), col = "orange", lwd = 3)
+t_mean <- mean(df2$Yac_EPA_Per_Play)
+meanvec = c()
+for(i in 1:length(x1)){
+  meanvec <- append(meanvec,t_mean)
+}
+lines(x1,meanvec, col = "Red", lwd = 3, lty = 2)
+t_mean = round(t_mean, digits=4)
+t_mean_text = paste(c("Mean Value: ", t_mean), collapse = " ")
+text(4.5, 0.45, t_mean_text)
+x2 = x1[c(FALSE, TRUE)]
+y2 = y1[c(FALSE, TRUE)]
+z1 = df2$Player_Name[c(FALSE, TRUE)]
+text(x2, y2,labels = z1,cex = 0.6, pos = 4, col = "red")
+
